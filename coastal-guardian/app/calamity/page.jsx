@@ -1,40 +1,52 @@
 "use client"
 
 import AuthorityNavbar from "@/components/authority-navbar"
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts"
 
-const data = [
-  { time: "00:00", tide: 1.2, wave: 0.5 },
-  { time: "03:00", tide: 1.5, wave: 0.8 },
-  { time: "06:00", tide: 2.1, wave: 1.1 },
-  { time: "09:00", tide: 2.4, wave: 1.6 },
-  { time: "12:00", tide: 2.8, wave: 2.1 },
-  { time: "15:00", tide: 2.3, wave: 1.8 },
-  { time: "18:00", tide: 1.7, wave: 1.0 },
-  { time: "21:00", tide: 1.3, wave: 0.6 },
-]
-
-export default function CalamityPage() {
+export default function NaturalCalamityPage() {
   return (
-    <>
+    <div className="min-h-screen bg-gradient-to-br from-sky-50 to-sky-100">
       <AuthorityNavbar />
-      <main className="mx-auto max-w-5xl px-4 py-6">
-        <h1 className="text-xl font-semibold">Natural Calamity Visualization</h1>
-        <p className="text-sm text-slate-600">Model-sensed data over the last 24 hours.</p>
-
-        <div className="mt-6 rounded border p-4 h-80">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="time" />
-              <YAxis />
-              <Tooltip />
-              <Line type="monotone" dataKey="tide" stroke="#0369a1" strokeWidth={2} dot={false} />
-              <Line type="monotone" dataKey="wave" stroke="#10b981" strokeWidth={2} dot={false} />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+      <main className="mx-auto max-w-5xl px-4 py-10">
+        <h1 className="text-3xl font-extrabold text-sky-700 mb-8 text-center">Natural Calamities Predictor</h1>
+        
+        {/* Heat Map Section */}
+        <section className="mb-8 rounded-2xl border border-sky-100 bg-white shadow p-6">
+          <h2 className="text-xl font-bold text-sky-800 mb-4">Regional Heat Map</h2>
+          <img
+            src="/images/algae-heatmap.png"
+            alt="Algae Heat Map"
+            className="w-full max-h-96 object-contain rounded-lg border"
+          />
+        </section>
+        
+        {/* Visual Graphs Section */}
+        <section className="mb-8 rounded-2xl border border-sky-100 bg-white shadow p-6">
+          <h2 className="text-xl font-bold text-sky-800 mb-4">Visual Graphs</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <img
+              src="/images/algae-graph1.png"
+              alt="Algae Graph 1"
+              className="w-full object-contain rounded-lg border"
+            />
+            <img
+              src="/images/algae-graph2.png"
+              alt="Algae Graph 2"
+              className="w-full object-contain rounded-lg border"
+            />
+          </div>
+        </section>
+        
+        {/* Detailed Analysis Section */}
+        <section className="rounded-2xl border border-sky-100 bg-white shadow p-6">
+          <h2 className="text-xl font-bold text-sky-800 mb-4">Detailed Analysis</h2>
+          <textarea
+            className="w-full min-h-[120px] border border-sky-200 rounded-lg p-3 text-slate-800 bg-sky-50 focus:outline-none focus:ring-2 focus:ring-sky-400"
+            placeholder="Enter or view detailed analysis here..."
+            readOnly
+            value="Algae bloom activity is concentrated in the northern region, with a significant increase over the past week. Environmental factors such as temperature and nutrient levels are contributing to the spread. Immediate monitoring and mitigation are recommended."
+          />
+        </section>
       </main>
-    </>
+    </div>
   )
 }

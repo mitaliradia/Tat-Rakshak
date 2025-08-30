@@ -8,19 +8,23 @@ import { cloneAlerts } from "@/lib/data"
 export default function AuthorityHomePage() {
   const alerts = cloneAlerts()
   return (
-    <>
+    <div className="min-h-screen bg-gradient-to-br from-sky-50 to-sky-100">
       <AuthorityNavbar />
-      <main className="mx-auto max-w-5xl px-4 py-6">
-        <section className="rounded-lg border p-6">
-          <h1 className="text-xl font-semibold">Coastal Guardian</h1>
-          <p className="text-sm text-slate-600">Issue official alerts and monitor community reports in real time.</p>
+      <main className="mx-auto max-w-5xl px-4 py-10">
+        <section className="rounded-2xl border border-sky-100 bg-white shadow p-8 mb-8">
+          <h1 className="text-3xl font-extrabold text-sky-700 mb-2">TAT - RAKSHAK</h1>
+          <p className="text-base text-slate-700">
+            Issue official alerts and monitor community reports in real time.
+          </p>
         </section>
 
-        <h2 className="mt-6 text-lg font-semibold">Recent Alerts</h2>
-        <AlertsFeed initialItems={alerts} />
+        <section className="rounded-xl bg-white border border-sky-100 shadow p-6">
+          <h2 className="text-2xl font-bold text-sky-800 mb-4">Recent Alerts</h2>
+          <AlertsFeed initialItems={alerts} />
+        </section>
       </main>
 
       <FloatingAction href="/authority/add" label="Post an Issue" variant="authority" />
-    </>
+    </div>
   )
 }

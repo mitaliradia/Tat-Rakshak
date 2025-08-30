@@ -5,6 +5,10 @@ export const initialAlerts = [
     location: "Bay of Bengal - Cox's Bazar",
     description: "Oil sheen observed near fishing zone.",
     time: "10m ago",
+    comments: [
+    { user: "Alice", text: "This is a comment." },
+    { user: "Bob", text: "Another comment." }
+    ] 
   },
   {
     id: "a2",
@@ -12,6 +16,10 @@ export const initialAlerts = [
     location: "Mumbai Harbor",
     description: "Multiple bags thrown from a vessel at night.",
     time: "45m ago",
+    comments: [
+    { user: "Alice", text: "This is a comment." },
+    { user: "Bob", text: "Another comment." }
+    ]
   },
   {
     id: "a3",
@@ -19,8 +27,14 @@ export const initialAlerts = [
     location: "Sundarbans Delta",
     description: "Unauthorized expansion near mangrove edges.",
     time: "1h ago",
+    comments: [
+    { user: "Alice", text: "This is a comment." },
+    { user: "Bob", text: "Another comment." }
+    ]
   },
 ]
+
+
 
 export const initialRequests = [
   {

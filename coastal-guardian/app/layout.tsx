@@ -5,9 +5,14 @@ import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
-  generator: 'v0.app',
+  title: 'TAT-RAKSHAK - Coastal Guardian',
+  description: 'Create and manage coastal alerts efficiently with TAT-RAKSHAK - Coastal Guardian.',
+  generator: 'Next.js',
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon-16x16.png",
+    apple: "/apple-icon.png",
+  }
 }
 
 export default function RootLayout({

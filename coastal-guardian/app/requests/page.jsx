@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 
 function RequestCard({ item, onUpdate }) {
   return (
-    <div className="rounded border p-4 flex flex-col gap-2">
+    <div className="rounded border p-4 flex flex-col gap-2 bg-sky-50">
       <div className="flex items-center justify-between">
         <div className="text-sm text-slate-500">{item.time}</div>
         <span
@@ -28,14 +28,18 @@ function RequestCard({ item, onUpdate }) {
       <div className="text-xs text-slate-600">Reporter: {item.reporter}</div>
       <p className="text-sm leading-relaxed">{item.description}</p>
       {item.media?.length > 0 && (
-        <div className="mt-2 grid grid-cols-2 gap-2">
+        <div className="mt-2 grid grid-cols-2 gap-4">
           {item.media.map((m, i) => (
-            <img
+            <div
               key={i}
-              src={m.url || "/placeholder.svg?height=96&width=160&query=attached%20media"}
-              alt="Attached media"
-              className="h-24 w-full object-cover rounded border"
-            />
+              className="overflow-hidden rounded-lg border border-sky-100 bg-white shadow-sm flex items-center justify-center h-32"
+            >
+              <img
+                src={m.url || "/placeholder.svg?height=96&width=160&query=attached%20media"}
+                alt="Attached media"
+                className="object-cover h-full w-full transition-transform duration-200 hover:scale-105"
+              />
+            </div>
           ))}
         </div>
       )}
@@ -55,23 +59,35 @@ function RequestCard({ item, onUpdate }) {
 }
 
 export default function RequestsPage() {
-  const [items, setItems] = useState(cloneRequests())
+  const [requests, setRequests] = useState(cloneRequests())
 
-  function handleUpdate(id, status) {
-    setItems((prev) => prev.map((it) => (it.id === id ? { ...it, status } : it)))
+  const handleUpdate = (id, status) => {
+    setRequests((prev) =>
+      prev.map((req) =>
+        req.id === id ? { ...req, status } : req
+      )
+    )
   }
 
   return (
-    <>
+    <div className="min-h-screen bg-gradient-to-br from-sky-50 to-sky-100">
       <AuthorityNavbar />
-      <main className="mx-auto max-w-5xl px-4 py-6">
-        <h1 className="text-xl font-semibold">Pending Reports Queue</h1>
-        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-          {items.map((it) => (
-            <RequestCard key={it.id} item={it} onUpdate={handleUpdate} />
-          ))}
-        </div>
+      <main className="mx-auto max-w-5xl px-4 py-10">
+        <h1 className="text-3xl font-extrabold text-sky-700 mb-8 text-center">Requests & Reports</h1>
+        <section className="rounded-2xl border border-sky-100 bg-white shadow p-6">
+          {requests.length === 0 ? (
+            <p className="text-slate-700 text-center">
+              No requests at the moment.
+            </p>
+          ) : (
+            <div className="space-y-6">
+              {requests.map((item) => (
+                <RequestCard key={item.id} item={item} onUpdate={handleUpdate} />
+              ))}
+            </div>
+          )}
+        </section>
       </main>
-    </>
+    </div>
   )
 }

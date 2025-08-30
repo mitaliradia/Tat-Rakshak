@@ -1,5 +1,6 @@
 "use client"
 
+import AuthorityProfileButton from "./AuthorityProfileButton"
 import Link from "next/link"
 import { useState } from "react"
 import { Bell, ArrowRight, UserCircle2, LayoutDashboard } from "lucide-react"
@@ -18,7 +19,7 @@ export default function AuthorityNavbar() {
     <header className="w-full border-b bg-background">
       <div className="mx-auto max-w-5xl px-4 py-3 flex items-center justify-between">
         <Link href="/authority" className="font-semibold text-lg text-sky-700">
-          Coastal Guardian
+          TAT - RAKSHAK
         </Link>
         <nav className="flex items-center gap-3">
           <Link href="/dashboard" className="inline-flex items-center gap-2 text-sm text-slate-900">
@@ -53,10 +54,7 @@ export default function AuthorityNavbar() {
               </div>
             </PopoverContent>
           </Popover>
-          <button className="inline-flex items-center gap-2 text-sm text-slate-900" aria-label="Profile">
-            <UserCircle2 size={20} />
-            <span className="hidden sm:inline">Profile</span>
-          </button>
+          <AuthorityProfileButton />
         </nav>
       </div>
     </header>

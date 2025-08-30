@@ -1,61 +1,52 @@
 "use client"
 
 import AuthorityNavbar from "@/components/authority-navbar"
-import { useState } from "react"
 
-const hotspots = [
-  { id: "h1", name: "Gulf of Kutch", x: 35, y: 42, severity: "High" },
-  { id: "h2", name: "Chilika Lake", x: 62, y: 58, severity: "Medium" },
-  { id: "h3", name: "Bay of Bengal Shelf", x: 78, y: 30, severity: "Low" },
-]
-
-export default function AlgaeMapPage() {
-  const [active, setActive] = useState(hotspots[0])
-
+export default function AlgaePage() {
   return (
-    <>
+    <div className="min-h-screen bg-gradient-to-br from-sky-50 to-sky-100">
       <AuthorityNavbar />
-      <main className="mx-auto max-w-5xl px-4 py-6">
-        <h1 className="text-xl font-semibold">Algal Blooms Map</h1>
-        <p className="text-sm text-slate-600">Click a hotspot to drill down into location details.</p>
-
-        <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="relative aspect-[4/3] rounded border bg-[url('/coastline-map.png')] bg-cover">
-            {hotspots.map((h) => (
-              <button
-                key={h.id}
-                onClick={() => setActive(h)}
-                className="absolute h-4 w-4 rounded-full border-2 border-white bg-emerald-500"
-                style={{ left: `${h.x}%`, top: `${h.y}%` }}
-                aria-label={`Hotspot ${h.name}`}
-                title={`${h.name} (${h.severity})`}
-              />
-            ))}
+      <main className="mx-auto max-w-5xl px-4 py-10">
+        <h1 className="text-3xl font-extrabold text-sky-700 mb-8 text-center">Algae Bloom Analysis</h1>
+        
+        {/* Heat Map Section */}
+        <section className="mb-8 rounded-2xl border border-sky-100 bg-white shadow p-6">
+          <h2 className="text-xl font-bold text-sky-800 mb-4">Regional Heat Map</h2>
+          <img
+            src="/images/algae-heatmap.png"
+            alt="Algae Heat Map"
+            className="w-full max-h-96 object-contain rounded-lg border"
+          />
+        </section>
+        
+        {/* Visual Graphs Section */}
+        <section className="mb-8 rounded-2xl border border-sky-100 bg-white shadow p-6">
+          <h2 className="text-xl font-bold text-sky-800 mb-4">Visual Graphs</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <img
+              src="/images/algae-graph1.png"
+              alt="Algae Graph 1"
+              className="w-full object-contain rounded-lg border"
+            />
+            <img
+              src="/images/algae-graph2.png"
+              alt="Algae Graph 2"
+              className="w-full object-contain rounded-lg border"
+            />
           </div>
-          <div className="lg:col-span-2 rounded border p-4">
-            <h2 className="font-semibold">{active.name}</h2>
-            <p className="text-sm text-slate-600">Severity: {active.severity}</p>
-            <div className="mt-3 grid grid-cols-2 gap-3">
-              <div className="rounded border p-3">
-                <div className="text-xs text-slate-500">Chlorophyll</div>
-                <div className="font-semibold">Elevated</div>
-              </div>
-              <div className="rounded border p-3">
-                <div className="text-xs text-slate-500">Temperature</div>
-                <div className="font-semibold">31.2°C</div>
-              </div>
-              <div className="rounded border p-3">
-                <div className="text-xs text-slate-500">Turbidity</div>
-                <div className="font-semibold">Moderate</div>
-              </div>
-              <div className="rounded border p-3">
-                <div className="text-xs text-slate-500">DO</div>
-                <div className="font-semibold">6.1 mg/L</div>
-              </div>
-            </div>
-          </div>
-        </div>
+        </section>
+        
+        {/* Detailed Analysis Section */}
+        <section className="rounded-2xl border border-sky-100 bg-white shadow p-6">
+          <h2 className="text-xl font-bold text-sky-800 mb-4">Detailed Analysis</h2>
+          <textarea
+            className="w-full min-h-[120px] border border-sky-200 rounded-lg p-3 text-slate-800 bg-sky-50 focus:outline-none focus:ring-2 focus:ring-sky-400"
+            placeholder="Enter or view detailed analysis here..."
+            readOnly
+            value="Algae bloom activity is concentrated in the northern region, with a significant increase over the past week. Environmental factors such as temperature and nutrient levels are contributing to the spread. Immediate monitoring and mitigation are recommended."
+          />
+        </section>
       </main>
-    </>
+    </div>
   )
 }
