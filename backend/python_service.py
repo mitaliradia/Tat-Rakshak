@@ -18,11 +18,15 @@ load_dotenv()
 class PythonAIService:
     def __init__(self):
         """Initialize the AI service with external GEE API"""
+        # Check if we're being called from Node.js
+        self.is_nodejs_call = os.getenv('NODEJS_CALL') == 'true'
+        
         self.external_gee_api_key = os.getenv('EXTERNAL_GEE_API_KEY')
         self.external_gee_url = os.getenv('EXTERNAL_GEE_API_URL', 'https://api.external-gee.com')
         
         if not self.external_gee_api_key:
-            print("Warning: EXTERNAL_GEE_API_KEY not found in environment variables")
+            if not self.is_nodejs_call:
+                print("Warning: EXTERNAL_GEE_API_KEY not found in environment variables")
             self.external_gee_api_key = None
         
         self.groq_api_key = os.getenv('GROQ_API_KEY')
@@ -50,11 +54,13 @@ class PythonAIService:
                 self.client = MongoClient(mongodb_uri)
                 self.db = self.client['coastal_monitoring']
                 self.collection = self.db['ai_analysis']
-                print("Connected to MongoDB successfully")
+                if not self.is_nodejs_call:
+                    print("Connected to MongoDB successfully")
             else:
                 self.client = None
         except Exception as e:
-            print(f"MongoDB connection failed: {e}")
+            if not self.is_nodejs_call:
+                print(f"MongoDB connection failed: {e}")
             self.client = None
 
     def get_external_gee_data(self, location, data_type):
@@ -82,11 +88,13 @@ class PythonAIService:
             }
             
             # Use test data instead of trying external API
-            print(f"Using test data for {data_type}")
+            if not self.is_nodejs_call:
+                print(f"Using test data for {data_type}")
             return test_data.get(data_type)
                 
         except Exception as e:
-            print(f"Using fallback data for {data_type}")
+            if not self.is_nodejs_call:
+                print(f"Using fallback data for {data_type}")
             return test_data.get(data_type)
             
             
@@ -94,7 +102,8 @@ class PythonAIService:
     def run_analysis(self, location):
         """Run analysis for a specific location using external GEE data"""
         try:
-            print(f"Running analysis for {location} using external GEE API...")
+            if not self.is_nodejs_call:
+                print(f"Running analysis for {location} using external GEE API...")
             
             # Get sea level data from external GEE
             sea_level_data = self.get_external_gee_data(location, 'sea-level')
@@ -129,22 +138,7 @@ class PythonAIService:
             if self.client:
                 self.save_to_mongodb(results)
 
-            print(json.dumps({
-                "success": True,
-                "data": {
-                    "location": location,
-                    "timestamp": datetime.now().isoformat(),
-                    "threat_level": "normal",
-                    "insights": self.generate_ai_insights(location),
-                    "data_sources": {
-                        "sea_level": self.get_external_gee_data(location, "sea-level"),
-                        "cyclonic_activity": self.get_external_gee_data(location, "cyclonic-activity"),
-                        "ocean_data": self.get_external_gee_data(location, "ocean-data")
-                    },
-                    "ai_provider": "Groq - External GEE Data"
-                }
-            }))
-            return True
+            return results
                 
         except Exception as e:
             print(json.dumps({
@@ -152,8 +146,23 @@ class PythonAIService:
                 "error": str(e)
             }))
             return False
-        
-    
+
+    def run_all_analysis(self):
+        """Run analysis for all locations"""
+        try:
+            all_results = {}
+            for location in self.regions.keys():
+                if not self.is_nodejs_call:
+                    print(f"Running analysis for {location}...")
+                result = self.run_analysis(location)
+                if result:
+                    all_results[location] = result
+            
+            return all_results
+        except Exception as e:
+            if not self.is_nodejs_call:
+                print(f"Error running all analysis: {e}")
+            return False
         
     def generate_ai_insights(self, location, sea_level_data, cyclonic_data, ocean_data):
         """Generate AI insights using Groq"""
@@ -231,13 +240,14 @@ class PythonAIService:
                 return 'normal'
                 
         except Exception as e:
-            print(f"Error assessing threat level: {e}")
+            if not self.is_nodejs_call:
+                print(f"Error assessing threat level: {e}")
             return 'unknown'
     
     def save_to_mongodb(self, results):
         """Save results to MongoDB with proper error handling"""
         try:
-            if self.client is not None and hasattr(self, 'collection'):
+            if self.client is not None and hasattr(self, 'collection') and self.collection is not None:
                 # Make data JSON serializable
                 serializable_results = {
                     'location': results['location'],
@@ -249,11 +259,13 @@ class PythonAIService:
                 }
                 
                 self.collection.insert_one(serializable_results)
-                print(f"Results saved to MongoDB for {results['location']}")
+                if not self.is_nodejs_call:
+                    print(f"Results saved to MongoDB for {results['location']}")
                 return True
             return False
         except Exception as e:
-            print(f"Error saving to MongoDB: {e}")
+            if not self.is_nodejs_call:
+                print(f"Error saving to MongoDB: {e}")
             return False
        
             

@@ -18,7 +18,9 @@ class AIService {
                 this.scriptPath,
                 'analyze',
                 location
-            ]);
+            ], {
+                env: { ...process.env, NODEJS_CALL: 'true' }
+            });
 
             let outputData = '';
             let errorData = '';
@@ -34,9 +36,19 @@ class AIService {
             pythonProcess.on('close', (code) => {
                 if (code === 0) {
                     try {
+                        // Parse the JSON output from Python service
                         const result = JSON.parse(outputData);
-                        resolve(result);
+                        
+                        // Wrap the result in the expected format for the API
+                        resolve({
+                            success: true,
+                            data: result,
+                            location: location,
+                            timestamp: new Date().toISOString()
+                        });
                     } catch (e) {
+                        console.error('Failed to parse Python output:', e);
+                        console.error('Raw output:', outputData);
                         reject(new Error('Failed to parse Python output'));
                     }
                 } else {
@@ -55,7 +67,9 @@ class AIService {
             const pythonProcess = spawn(this.pythonPath, [
                 this.scriptPath,
                 'analyze_all'
-            ]);
+            ], {
+                env: { ...process.env, NODEJS_CALL: 'true' }
+            });
 
             let stdout = '';
             let stderr = '';
@@ -72,7 +86,13 @@ class AIService {
                 if (code === 0) {
                     try {
                         const result = JSON.parse(stdout);
-                        resolve(result);
+                        
+                        // Wrap the result in the expected format for the API
+                        resolve({
+                            success: true,
+                            data: result,
+                            timestamp: new Date().toISOString()
+                        });
                     } catch (error) {
                         reject(new Error(`Failed to parse Python output: ${error.message}`));
                     }
@@ -92,43 +112,62 @@ class AIService {
      * @returns {Promise<boolean>} - True if service is available
      */
     async checkServiceHealth() {
-        try {
-            const pythonProcess = spawn(this.pythonPath, [this.scriptPath, 'health']);
+        return new Promise((resolve, reject) => {
+            try {
+                // Test with a simple analyze command to check if service is working
+                const pythonProcess = spawn(this.pythonPath, [
+                    this.scriptPath, 
+                    'analyze', 
+                    'Pulicat Lake'
+                ], {
+                    env: { ...process.env, NODEJS_CALL: 'true' }
+                });
 
-            let stdout = '';
-            let stderr = '';
+                let stdout = '';
+                let stderr = '';
 
-            pythonProcess.stdout.on('data', (data) => {
-                stdout += data.toString();
-            });
+                pythonProcess.stdout.on('data', (data) => {
+                    stdout += data.toString();
+                });
 
-            pythonProcess.stderr.on('data', (data) => {
-                stderr += data.toString();
-            });
+                pythonProcess.stderr.on('data', (data) => {
+                    stderr += data.toString();
+                });
 
-            pythonProcess.on('close', (code) => {
-                if (code === 0) {
-                    try {
-                        const result = JSON.parse(stdout);
-                        return result.success || result.error !== 'AI Service not initialized';
-                    } catch (error) {
-                        console.error('Failed to parse health check output:', error);
-                        return false;
+                pythonProcess.on('close', (code) => {
+                    if (code === 0) {
+                        // Check if output contains expected analysis data
+                        if (stdout.includes('"location": "Pulicat Lake"') && 
+                            stdout.includes('"threat_level"') && 
+                            stdout.includes('"insights"')) {
+                            resolve(true);
+                        } else {
+                            console.error('Health check: Unexpected output format');
+                            resolve(false);
+                        }
+                    } else {
+                        console.error(`Health check process failed with code ${code}: ${stderr}`);
+                        resolve(false);
                     }
-                } else {
-                    console.error(`Health check process failed with code ${code}: ${stderr}`);
-                    return false;
-                }
-            });
+                });
 
-            pythonProcess.on('error', (error) => {
-                console.error('Failed to start health check process:', error);
-                return false;
-            });
-        } catch (error) {
-            console.error('Health check failed:', error);
-            return false;
-        }
+                pythonProcess.on('error', (error) => {
+                    console.error('Failed to start health check process:', error);
+                    resolve(false);
+                });
+
+                // Set a timeout to prevent hanging
+                setTimeout(() => {
+                    pythonProcess.kill();
+                    console.error('Health check timed out');
+                    resolve(false);
+                }, 30000); // 30 second timeout
+
+            } catch (error) {
+                console.error('Health check failed:', error);
+                resolve(false);
+            }
+        });
     }
 
     /**

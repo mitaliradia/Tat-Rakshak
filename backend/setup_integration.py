@@ -10,6 +10,16 @@ import json
 import subprocess
 from pathlib import Path
 
+# Load environment variables from .env file
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+    print("✅ Loaded .env file")
+except ImportError:
+    print("⚠️  python-dotenv not available, using system environment variables")
+except Exception as e:
+    print(f"⚠️  Error loading .env file: {e}")
+
 def check_python_dependencies():
     """Check if all required Python packages are installed"""
     print("🔍 Checking Python dependencies...")
@@ -50,19 +60,29 @@ def check_environment_variables():
     """Check if required environment variables are set"""
     print("\n🔍 Checking environment variables...")
     
-    required_vars = ['MONGODB_URI','EXTERNAL_GEE_API_KEY', 'GROQ_API_KEY']
+    required_vars = ['MONGODB_URI', 'EXTERNAL_GEE_API_KEY', 'GROQ_API_KEY']
     missing_vars = []
     
     for var in required_vars:
-        if os.getenv(var):
-            print(f"✅ {var}")
+        value = os.getenv(var)
+        if value:
+            # Show first few characters of the value for verification
+            display_value = value[:10] + "..." if len(value) > 10 else value
+            print(f"✅ {var} = {display_value}")
         else:
             print(f"❌ {var} - MISSING")
             missing_vars.append(var)
     
     if missing_vars:
         print(f"\n⚠️  Missing environment variables: {', '.join(missing_vars)}")
-        print("Please set these in your .env file")
+        print("Please set these in your .env file:")
+        for var in missing_vars:
+            if var == 'MONGODB_URI':
+                print(f"  {var}=mongodb://localhost:27017/coastal_monitoring")
+            elif var == 'EXTERNAL_GEE_API_KEY':
+                print(f"  {var}=your_actual_external_gee_api_key_here")
+            elif var == 'GROQ_API_KEY':
+                print(f"  {var}=your_actual_groq_api_key_here")
         return False
     
     print("✅ All environment variables are set!")
@@ -79,17 +99,23 @@ def test_python_service():
         ], capture_output=True, text=True, timeout=60)
         
         if result.returncode == 0:
-            try:
-                output = json.loads(result.stdout)
-                if output.get('success'):
-                    print("✅ Python service test successful!")
-                    return True
-                else:
-                    print(f"⚠️  Python service returned error: {output.get('error')}")
-                    return False
-            except json.JSONDecodeError:
-                print("⚠️  Python service output is not valid JSON")
-                print(f"Output: {result.stdout}")
+            # Check if the output contains the expected analysis data
+            output = result.stdout.strip()
+            
+            # Look for key indicators of successful analysis
+            if ('"location": "Pulicat Lake"' in output and 
+                '"threat_level"' in output and 
+                '"insights"' in output and
+                '"data_sources"' in output):
+                print("✅ Python service test successful!")
+                print("   - Analysis completed for Pulicat Lake")
+                print("   - Threat level assessment generated")
+                print("   - AI insights created")
+                print("   - Data sources processed")
+                return True
+            else:
+                print("⚠️  Python service output format unexpected")
+                print(f"Output: {output[:200]}...")
                 return False
         else:
             print(f"❌ Python service test failed with code {result.returncode}")
@@ -112,11 +138,13 @@ def create_env_template():
         env_template = """# MongoDB Connection
 MONGODB_URI=mongodb://localhost:27017/coastal_monitoring
 
-#External Google Earth Engine API (using someone else's key)
+# External Google Earth Engine API (using someone else's key)
+# You need to get this from the person who owns the GEE account
 EXTERNAL_GEE_API_KEY=your_external_gee_api_key_here
 EXTERNAL_GEE_API_URL=https://api.external-gee.com
 
 # Groq API Key for AI inference
+# Get this from: https://console.groq.com/
 GROQ_API_KEY=your_groq_api_key_here
 
 # Node.js Environment
@@ -131,9 +159,27 @@ PYTHON_PATH=python
             f.write(env_template)
         
         print("✅ Created .env template")
-        print("⚠️  Please update the values in .env file")
+        print("⚠️  Please update the values in .env file:")
+        print("  1. Get EXTERNAL_GEE_API_KEY from the GEE account owner")
+        print("  2. Get GROQ_API_KEY from https://console.groq.com/")
+        print("  3. Update MONGODB_URI if using a different database")
     else:
         print("✅ .env file already exists")
+        print("📝 Current .env contents:")
+        try:
+            with open('.env', 'r') as f:
+                content = f.read()
+                # Show only the first few lines to avoid exposing sensitive data
+                lines = content.split('\n')[:5]
+                for line in lines:
+                    if line.strip() and not line.startswith('#'):
+                        # Show only the key name, not the value
+                        key = line.split('=')[0] if '=' in line else line
+                        print(f"     {key}")
+                if len(content.split('\n')) > 5:
+                    print("     ... (more lines)")
+        except Exception as e:
+            print(f"     Error reading .env file: {e}")
 
 def main():
     """Main setup function"""
