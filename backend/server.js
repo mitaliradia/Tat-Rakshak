@@ -6,6 +6,7 @@ const authRoutes = require('./routes/auth');
 const alertRoutes = require('./routes/alerts');
 const reportRoutes = require('./routes/reports');
 const dataRoutes = require('./routes/data');
+const aiRoutes = require('./routes/ai');
 const path = require('path');
 require('dotenv').config();
 
@@ -29,6 +30,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/alerts', alertRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/data', dataRoutes);
+app.use('/api/ai', aiRoutes);
 
 // Serve React app in production
 if (process.env.NODE_ENV === 'production') {

@@ -7,7 +7,9 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "init-db": "node scripts/initDB.js",
-    "test": "echo \"Error: no tests specified\" && exit 1"
+    "test": "echo \"Error: no tests specified\" && exit 1",
+    "test-integration": "node test_integration.js",
+    "setup": "python setup_integration.py"
   },
   "keywords": [
     "coastal",

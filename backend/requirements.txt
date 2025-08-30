@@ -1,0 +1,23 @@
+# Core Earth Engine & Data Processing
+earthengine-api>=0.1.374
+geemap>=0.29.2
+pandas>=2.0.0
+numpy>=1.24.0
+matplotlib>=3.7.0
+scikit-learn>=1.3.0
+# Google Earth Engine (using external API key)
+earthengine-api>=0.1.374
+geemap>=0.29.2
+
+# Database & API Connections
+pymongo>=4.5.0
+requests>=2.31.0
+
+# AI/ML Inference (For Groq API)
+groq>=0.3.0
+
+# Environment variables
+python-dotenv>=1.0.0
+
+# Additional dependencies for the service
+pathlib2>=2.3.7
