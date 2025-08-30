@@ -33,7 +33,8 @@ except Exception as e:
     print("Run: ee.Authenticate() and then ee.Initialize()")
 
 class CoastalAIAnalyst:
-    def __init__(self, mongodb_uri="mongodb+srv://shrutipatel0308:prNaEIQnvZTv6Iwy@cluster0.22ngsj8.mongodb.net/hackout25?retryWrites=true&w=majority&appName=Cluster0"):
+    def __init__(self, mongodb_uri=None):
+        self.mongodb_uri = os.getenv('MONGODB_URI)
         
         self.groq_api_key = os.getenv('GROQ_API_KEY')
         if not self.groq_api_key:
@@ -630,4 +631,5 @@ if __name__ == "__main__":
         ai_provider = results['ai_provider']
         print(f"📍 {location:15} | AI: {ai_provider:16} | Threat: {threat_level.upper():8} | Anomalies: {anomalies:3d}")
     
+
     print(f"\nAnalysis completed at {datetime.now().strftime('%Y-%m-%d %H:%M')}")
