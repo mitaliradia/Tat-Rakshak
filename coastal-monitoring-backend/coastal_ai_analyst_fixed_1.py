@@ -34,7 +34,7 @@ except Exception as e:
 
 class CoastalAIAnalyst:
     def __init__(self, mongodb_uri=None):
-        self.mongodb_uri = os.getenv('MONGODB_URI)
+        self.mongodb_uri = os.getenv('MONGODB_URI')
         
         self.groq_api_key = os.getenv('GROQ_API_KEY')
         if not self.groq_api_key:
@@ -62,7 +62,7 @@ class CoastalAIAnalyst:
         # MongoDB connection
         try:
             self.client = MongoClient(mongodb_uri)
-            self.db = self.client['coastal_monitoring']
+            self.db = self.client['hackout25']  # Changed to match backend database
             self.collection = self.db['ai_analysis']
             self.map_collection = self.db['map_configurations']
             print("Connected to MongoDB successfully")
@@ -312,7 +312,7 @@ Anomalies Detected: {len(anomalies)}
                 upsert=True
             )
             
-            print(f"🗺️ Map configuration saved for {location}")
+            print(f"Map configuration saved for {location}")
             return True
             
         except Exception as e:
@@ -518,7 +518,7 @@ Anomalies Detected: {len(anomalies)}
     def run_complete_analysis_pipeline(self, location):
         """Complete analysis pipeline for a location"""
         print(f"\n{'='*60}")
-        print(f"🌊 ANALYZING: {location}")
+        print(f"ANALYZING: {location}")
         print(f"{'='*60}")
         
         try:
@@ -629,7 +629,7 @@ if __name__ == "__main__":
         threat_level = results['threat_level']
         anomalies = results['anomaly_count']
         ai_provider = results['ai_provider']
-        print(f"📍 {location:15} | AI: {ai_provider:16} | Threat: {threat_level.upper():8} | Anomalies: {anomalies:3d}")
+        print(f"{location:15} | AI: {ai_provider:16} | Threat: {threat_level.upper():8} | Anomalies: {anomalies:3d}")
     
 
     print(f"\nAnalysis completed at {datetime.now().strftime('%Y-%m-%d %H:%M')}")

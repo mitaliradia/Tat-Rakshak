@@ -2,6 +2,8 @@
 
 import Navbar from "@/components/navbar"
 import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { requestsService } from "@/services"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -9,11 +11,14 @@ import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 export default function ReportIssuePage() {
+  const router = useRouter()
   const [type, setType] = useState("Pollution")
   const [other, setOther] = useState("")
   const [location, setLocation] = useState("")
   const [desc, setDesc] = useState("")
   const [files, setFiles] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-50 to-sky-100">
@@ -21,12 +26,48 @@ export default function ReportIssuePage() {
       <main className="mx-auto max-w-2xl px-4 py-10">
         <h1 className="text-2xl font-extrabold text-sky-700 mb-2">Report an Issue</h1>
         <p className="text-sm text-slate-600 mb-6">No login required. Your report will be anonymous.</p>
+        
+        {error && (
+          <div className="bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded-lg mb-4">
+            {error}
+          </div>
+        )}
 
         <form
           className="bg-white rounded-2xl shadow-xl border border-sky-100 p-8 space-y-6"
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault()
-            alert("Submitted! (Demo) — Thank you for your report.")
+            setError('')
+            setLoading(true)
+            
+            try {
+              const reportData = {
+                type: type === 'Other' ? other : type,
+                location,
+                description: desc,
+                reporterName: 'Anonymous'
+                // Note: File upload would need additional handling
+              }
+              
+              const result = await requestsService.submitRequest(reportData)
+              
+              if (result.success) {
+                alert('Thank you for your report! It has been submitted to authorities.')
+                // Reset form
+                setType('Pollution')
+                setOther('')
+                setLocation('')
+                setDesc('')
+                setFiles([])
+                router.push('/')
+              } else {
+                setError(result.message)
+              }
+            } catch (err) {
+              setError('Failed to submit report. Please try again.')
+            }
+            
+            setLoading(false)
           }}
         >
           <div className="space-y-2">
@@ -84,8 +125,12 @@ export default function ReportIssuePage() {
             <p className="text-xs text-slate-500">{files.length} file(s) selected</p>
           </div>
 
-          <Button className="w-full bg-sky-700 hover:bg-sky-800 text-white font-semibold rounded-lg py-2 transition">
-            Submit
+          <Button 
+            type="submit"
+            disabled={loading || !location || !desc}
+            className="w-full bg-sky-700 hover:bg-sky-800 text-white font-semibold rounded-lg py-2 transition disabled:opacity-50"
+          >
+            {loading ? 'Submitting...' : 'Submit'}
           </Button>
         </form>
       </main>
